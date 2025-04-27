@@ -1,31 +1,59 @@
 package ar.edu.unq.po2.tp2;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Empresa {
 	private String nombre;
 	private String cuit;
-	private List<Empleado> empleados;
+	private List<Empleado> empleados = new ArrayList<>();
+    private List<ReciboHaberes> recibos = new ArrayList<>();
 	
-	public Empresa(String nombre, String cuit, List<Empleado> empleados) {
+	public Empresa(String nombre, String cuit) {
 		this.nombre = nombre;
 		this.cuit = cuit;
-		this.empleados = empleados;
 	}
 	
-	public float montoTotalSueldosNetosEmpleados() {
-		return (float)0.1;
+	public void agregarEmpleado(Empleado empleado) {
+        this.empleados.add(empleado);
+    }
+	
+	public double montoTotalSueldosNetosEmpleados() {
+		return empleados.stream()
+                .mapToDouble(e -> e.sueldoNeto())
+                .sum();
 	}
 	
-	public float montoTotalSueldosBrutosEmpleados() {
-		return (float)0.1;
+	public double montoTotalSueldosBrutosEmpleados() {
+		return empleados.stream()
+                .mapToDouble(e -> e.sueldoBruto())
+                .sum();
 	}
 	
-	public float montoTotalRetencionesEmpleados() {
-		return (float)0.1;
+	public double montoTotalRetencionesEmpleados() {
+		return empleados.stream()
+                .mapToDouble(e -> e.retenciones())
+                .sum();
 	}
 	
 	public void liquidarSueldos() {
-		
+        recibos.clear();
+        for (Empleado empleado : empleados) {
+            ReciboHaberes recibo = new ReciboHaberes(
+                empleado.getNombre(),
+                empleado.getDireccion(),
+                LocalDate.now(),
+                empleado.sueldoBruto(),
+                empleado.sueldoNeto(),
+                empleado.generarConceptos()
+            );
+            recibos.add(recibo);
+        }
+    }
+	
+	public List<ReciboHaberes> getRecibos(){
+		return this.recibos;
 	}
 }
